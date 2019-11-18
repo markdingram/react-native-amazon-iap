@@ -25,6 +25,7 @@ export interface Product {
 
 export interface ProductsResponse {
     requestStatus: 'SUCCESSFUL' | 'FAILED' | 'NOT_SUPPORTED'
+    unavailableSkus: string[]
     productData: Product[]
 }
 
@@ -66,4 +67,8 @@ export function getPurchaseUpdates() : Promise<PurchaseUpdatesResponse> {
 
 export function purchase(sku: string) : Promise<PurchaseResponse> {
     return AmazonIap.purchase(sku)
+}
+
+export function notifyFulfillment(receiptId: String, fulfillmentResult: 'FULFILLED' | 'UNAVAILABLE') {
+    AmazonIap.notifyFulfillment(receiptId, fulfillmentResult)
 }

@@ -1,5 +1,7 @@
 package io.github.markdingram;
 
+import android.util.Log;
+
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -50,6 +52,10 @@ public class AmazonIapModule extends ReactContextBaseJavaModule {
         store.purchase(sku).thenAccept(promiseConsumer(promise));
     }
 
+    @ReactMethod
+    public void notifyFulfillment(String receiptId, String fulfillmentResult) {
+        store.notifyFulfillment(receiptId, fulfillmentResult);
+    }
 
 
     private static Consumer<JSONObject> promiseConsumer(final Promise promise) {
@@ -57,6 +63,7 @@ public class AmazonIapModule extends ReactContextBaseJavaModule {
             @Override
             public void accept(JSONObject o) {
                 try {
+                    Log.d("amazon-iap","promiseConsumer - " + o.toString());
                     promise.resolve(Json.convertJsonToMap(o));
                 } catch (JSONException e) {
                     e.printStackTrace();

@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.amazon.device.iap.PurchasingListener;
 import com.amazon.device.iap.PurchasingService;
+import com.amazon.device.iap.model.FulfillmentResult;
 import com.amazon.device.iap.model.Product;
 import com.amazon.device.iap.model.ProductDataResponse;
 import com.amazon.device.iap.model.PurchaseResponse;
@@ -68,6 +69,10 @@ public class AmazonIapStore implements PurchasingListener {
         }
     }
 
+    public void notifyFulfillment(String receiptId, String fulfillmentResult) {
+        PurchasingService.notifyFulfillment(receiptId, FulfillmentResult.valueOf(fulfillmentResult));
+    }
+
     @Override
     public void onUserDataResponse(UserDataResponse response) {
         synchronized (pending) {
@@ -76,7 +81,7 @@ public class AmazonIapStore implements PurchasingListener {
                 try {
                     JSONObject o = new JSONObject();
                     o.put("requestStatus", response.getRequestStatus());
-                    o.put("userData", response.getUserData());
+                    o.put("userData", response.getUserData().toJSON());
                     future.complete(o);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -100,6 +105,7 @@ public class AmazonIapStore implements PurchasingListener {
                         a.put(pd.toJSON());
                     }
                     o.put("productData", a);
+                    o.put("unavailableSkus", response.getUnavailableSkus());
 
                     future.complete(o);
                 } catch (JSONException e) {
@@ -139,6 +145,7 @@ public class AmazonIapStore implements PurchasingListener {
                     for (Receipt r : response.getReceipts()) {
                         a.put(r.toJSON());
                     }
+                    o.put("receipts", a);
                     o.put("hasMore", response.hasMore());
                     future.complete(o);
                 } catch (JSONException e) {
