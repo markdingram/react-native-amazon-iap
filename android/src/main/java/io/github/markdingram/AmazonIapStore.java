@@ -4,12 +4,15 @@ import android.content.Context;
 
 import com.amazon.device.iap.PurchasingListener;
 import com.amazon.device.iap.PurchasingService;
+import com.amazon.device.iap.model.Product;
 import com.amazon.device.iap.model.ProductDataResponse;
 import com.amazon.device.iap.model.PurchaseResponse;
 import com.amazon.device.iap.model.PurchaseUpdatesResponse;
+import com.amazon.device.iap.model.Receipt;
 import com.amazon.device.iap.model.RequestId;
 import com.amazon.device.iap.model.UserDataResponse;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -47,7 +50,7 @@ public class AmazonIapStore implements PurchasingListener {
         }
     }
 
-    public CompletableFuture<JSONObject> refresh() {
+    public CompletableFuture<JSONObject> getPurchaseUpdates() {
         synchronized (pending) {
             RequestId requestId = PurchasingService.getPurchaseUpdates(PURCHASE_UPDATES_RESET);
             CompletableFuture<JSONObject> future = new CompletableFuture<>();
@@ -71,10 +74,13 @@ public class AmazonIapStore implements PurchasingListener {
             CompletableFuture<JSONObject> future = pending.remove(response.getRequestId());
             if (future != null) {
                 try {
-                    JSONObject object = response.toJSON();
-                    future.complete(object);
+                    JSONObject o = new JSONObject();
+                    o.put("requestStatus", response.getRequestStatus());
+                    o.put("userData", response.getUserData());
+                    future.complete(o);
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    future.completeExceptionally(e);
                 }
             }
         }
@@ -86,10 +92,19 @@ public class AmazonIapStore implements PurchasingListener {
             CompletableFuture<JSONObject> future = pending.remove(response.getRequestId());
             if (future != null) {
                 try {
-                    JSONObject object = response.toJSON();
-                    future.complete(object);
+                    JSONObject o = new JSONObject();
+                    o.put("requestStatus", response.getRequestStatus());
+
+                    JSONArray a = new JSONArray();
+                    for (Product pd : response.getProductData().values()) {
+                        a.put(pd.toJSON());
+                    }
+                    o.put("productData", a);
+
+                    future.complete(o);
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    future.completeExceptionally(e);
                 }
             }
         }
@@ -105,10 +120,10 @@ public class AmazonIapStore implements PurchasingListener {
                     future.complete(object);
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    future.completeExceptionally(e);
                 }
             }
         }
-
     }
 
     @Override
@@ -117,10 +132,18 @@ public class AmazonIapStore implements PurchasingListener {
             CompletableFuture<JSONObject> future = pending.remove(response.getRequestId());
             if (future != null) {
                 try {
-                    JSONObject object = response.toJSON();
-                    future.complete(object);
+                    JSONObject o = new JSONObject();
+                    o.put("requestStatus", response.getRequestStatus());
+                    o.put("userData", response.getUserData().toJSON());
+                    JSONArray a = new JSONArray();
+                    for (Receipt r : response.getReceipts()) {
+                        a.put(r.toJSON());
+                    }
+                    o.put("hasMore", response.hasMore());
+                    future.complete(o);
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    future.completeExceptionally(e);
                 }
             }
         }

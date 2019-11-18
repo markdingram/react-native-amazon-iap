@@ -36,13 +36,13 @@ public class AmazonIapModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void getItems(ReadableArray skus, final Promise promise) {
-        store.getProducts(convert(skus)).thenAccept(promiseConsumer(promise));
+    public void getPurchaseUpdates(final Promise promise) {
+        store.getPurchaseUpdates().thenAccept(promiseConsumer(promise));
     }
 
     @ReactMethod
-    public void refresh(final Promise promise) {
-        store.refresh().thenAccept(promiseConsumer(promise));
+    public void getProducts(ReadableArray skus, final Promise promise) {
+        store.getProducts(convert(skus)).thenAccept(promiseConsumer(promise));
     }
 
     @ReactMethod
