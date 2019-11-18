@@ -44,3 +44,8 @@ buck-out/
 
 index.js
 index.js.map
+
+# Code
+.settings/
+.classpath
+.project

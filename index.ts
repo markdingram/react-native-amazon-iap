@@ -2,4 +2,12 @@ import { NativeModules } from 'react-native'
 
 const { AmazonIap } = NativeModules
 
-export default AmazonIap
+
+export interface User {
+    userId: string,
+    marketplace: string
+}
+
+export function getUser() : Promise<User> {
+    return AmazonIap.getUser()
+}
