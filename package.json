@@ -29,9 +29,9 @@
     "react-native": ">=0.59.0-rc.0 <1.0.x"
   },
   "devDependencies": {
-    "@types/react-native": "^0.60.22",
+    "@types/react-native": "^0.61.4",
     "react": "^16.8.3",
-    "react-native": "^0.59.10",
-    "typescript": "^3.7.2"
+    "react-native": "^0.61.4",
+    "typescript": "^3.7.5"
   }
 }
